@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <iostream>
+#include <cstdlib>
 
 class VeryLongInteger {
 private:
@@ -13,6 +14,8 @@ public:
 	VeryLongInteger() = default;
 	VeryLongInteger(int num) {
 		int digit;
+		if (num < 0) negative = true;
+		num = std::abs(num);
 		while (num > 0) {
 			digit = num % 10;
 			digits.insert(digits.begin(), digit);
@@ -20,14 +23,27 @@ public:
 		}		
 	}
 
+	VeryLongInteger(VeryLongInteger& other) : digits{ other.digits }, negative{ other.negative } {}
 
+	VeryLongInteger& operator = (const VeryLongInteger& other) {
+		digits = other.digits;
+		negative = other.negative;
+		return *this;
+	}
+
+	
 
 	friend std::ostream& operator << (std::ostream& out, const VeryLongInteger& object);
 
 };
 
 std::ostream& operator << (std::ostream& out, const VeryLongInteger& object) {
-	out << object.digits;
+	if (object.negative) {
+		out << "-";
+	}
+	for (int digit : object.digits) {
+		out << digit;
+	}
 	return out;
 }
 
