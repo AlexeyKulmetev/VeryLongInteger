@@ -12,6 +12,7 @@ private:
 
 public:
 	VeryLongInteger() = default;
+	
 	VeryLongInteger(int num) {
 		int digit;
 		if (num < 0) negative = true;
@@ -29,6 +30,15 @@ public:
 		digits = other.digits;
 		negative = other.negative;
 		return *this;
+	}
+
+	VeryLongInteger& operator += (const VeryLongInteger& other) {
+		std::vector<int>::iterator itThis = digits.rbegin();
+		std::vector<int>::iterator itOther = other.digits.rbegin();
+	}
+
+	VeryLongInteger operator + (const VeryLongInteger& other) {
+
 	}
 
 	
