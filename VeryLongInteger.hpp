@@ -24,17 +24,49 @@ public:
 		}		
 	}
 
-	VeryLongInteger(VeryLongInteger& other) : digits{ other.digits }, negative{ other.negative } {}
+	VeryLongInteger(const VeryLongInteger& other) : digits{ other.digits }, negative{ other.negative } {}
 
 	VeryLongInteger& operator = (const VeryLongInteger& other) {
-		digits = other.digits;
-		negative = other.negative;
+		if (this != &other) {
+			digits = other.digits;
+			negative = other.negative;
+		}
 		return *this;
 	}
 
 	VeryLongInteger& operator += (const VeryLongInteger& other) {
-		std::vector<int>::iterator itThis = digits.rbegin();
-		std::vector<int>::iterator itOther = other.digits.rbegin();
+		// if both numbers are positive
+		if (this->negative == other.negative) {
+			auto itThis = digits.rbegin();
+			auto itOther = other.digits.rbegin();
+
+			std::vector<int> tmpDigits(std::max(digits.size(), other.digits.size()));
+			int carry = 0;
+
+			while (itThis != digits.rend() || itOther != other.digits.rend() || carry != 0) {
+				int sum = carry;
+				if (itThis != digits.rend()) {
+					sum += *itThis;
+					++itThis;
+				}
+				if (itOther != other.digits.rend()) {
+					sum += *itOther;
+					++itOther;
+				}
+
+				tmpDigits.insert(tmpDigits.begin(), sum % 10);
+				carry = sum / 10;
+			}
+
+			digits = tmpDigits;
+		}
+
+		else {
+			//itPos = // assign rbegin() of positive vector
+			//itNegative = // assign rbegin() of negative vector
+
+		}
+
 	}
 
 	VeryLongInteger operator + (const VeryLongInteger& other) {

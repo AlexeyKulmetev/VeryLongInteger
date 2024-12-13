@@ -2,7 +2,10 @@
 
 int main() {
 	VeryLongInteger longInt(-567);
-	std::cout << longInt;
+	VeryLongInteger longInt_2(200);
+	std::cout << longInt << "\n" << longInt_2 << "\n";
+	longInt = longInt_2;
+	std::cout << longInt << "\n" << longInt_2 << "\n";
 //	std::cout << "test";
 	return 0;
 }
