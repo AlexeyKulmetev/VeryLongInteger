@@ -10,6 +10,24 @@ private:
 	std::vector<int> digits;
 	bool negative = false;
 
+	void addAbs(const VeryLongInteger& other) {
+		std::vector<int>::iterator itThis = digits.begin();
+		std::vector<int>::const_iterator itOther = other.digits.begin();
+		int carry = 0;
+
+		std::vector<int> result;
+
+		while (itThis != digits.end() || itOther != digits.end() || carry) {
+			int sum = carry;
+			if (itThis != digits.end())			{ sum += *itThis++; }
+			if (itOther != other.digits.end())	{ sum += *itThis++; }
+			carry = sum / 10;
+			result.push_back(sum % 10);
+		}
+
+		digits = std::move(result);
+	}
+
 public:
 	VeryLongInteger() = default;
 	
@@ -35,42 +53,18 @@ public:
 	}
 
 	VeryLongInteger& operator += (const VeryLongInteger& other) {
-		// if both numbers are positive
+		// if both numbers are positive or negative
 		if (this->negative == other.negative) {
-			auto itThis = digits.rbegin();
-			auto itOther = other.digits.rbegin();
-
-			std::vector<int> tmpDigits(std::max(digits.size(), other.digits.size()));
-			int carry = 0;
-
-			while (itThis != digits.rend() || itOther != other.digits.rend() || carry != 0) {
-				int sum = carry;
-				if (itThis != digits.rend()) {
-					sum += *itThis;
-					++itThis;
-				}
-				if (itOther != other.digits.rend()) {
-					sum += *itOther;
-					++itOther;
-				}
-
-				tmpDigits.insert(tmpDigits.begin(), sum % 10);
-				carry = sum / 10;
-			}
-
-			digits = tmpDigits;
+			addAbs(other);
 		}
 
-		else {
-			//itPos = // assign rbegin() of positive vector
-			//itNegative = // assign rbegin() of negative vector
-
-		}
-
+		return *this;
 	}
 
 	VeryLongInteger operator + (const VeryLongInteger& other) {
-
+		VeryLongInteger sum = *this;
+		sum += other;
+		return sum;
 	}
 
 	
