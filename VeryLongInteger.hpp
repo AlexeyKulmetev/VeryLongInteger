@@ -11,18 +11,18 @@ private:
 	bool negative = false;
 
 	void addAbs(const VeryLongInteger& other) {
-		std::vector<int>::iterator itThis = digits.begin();
-		std::vector<int>::const_iterator itOther = other.digits.begin();
+		auto itThis = digits.rbegin();
+		auto itOther = other.digits.rbegin();
 		int carry = 0;
 
 		std::vector<int> result;
 
-		while (itThis != digits.end() || itOther != digits.end() || carry) {
+		while (itThis != digits.rend() || itOther != other.digits.rend() || carry) {
 			int sum = carry;
-			if (itThis != digits.end())			{ sum += *itThis++; }
-			if (itOther != other.digits.end())	{ sum += *itThis++; }
+			if (itThis != digits.rend())		{ sum += *itThis++; }
+			if (itOther != other.digits.rend())	{ sum += *itOther++; }
 			carry = sum / 10;
-			result.push_back(sum % 10);
+			result.insert(result.begin(), sum % 10);
 		}
 
 		digits = std::move(result);
@@ -31,7 +31,7 @@ private:
 public:
 	VeryLongInteger() = default;
 	
-	VeryLongInteger(int num) {
+	VeryLongInteger(long long num) {
 		int digit;
 		if (num < 0) negative = true;
 		num = std::abs(num);
