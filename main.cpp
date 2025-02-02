@@ -1,8 +1,8 @@
 #include "VeryLongInteger.hpp"
 
 int main() {
-	VeryLongInteger longInt(1235648975615);
-	VeryLongInteger longInt_2(123454812315486);
+	VeryLongInteger longInt(-333);
+	VeryLongInteger longInt_2(111);
 	std::cout << longInt << "\n" << longInt_2 << "\n";
 	//longInt = longInt_2;
 
