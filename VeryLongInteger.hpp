@@ -35,9 +35,53 @@ public:
 		}
 	}
 
+	~VeryLongInteger() = default;
+
+	VeryLongInteger& operator = (const VeryLongInteger& other) {
+		if (this == &other) return *this;
+
+		digits = other.digits;
+		negative = other.negative;
+		return *this;
+	}
+
+	VeryLongInteger& operator += (const VeryLongInteger& other) {
+
+	}
+
 private:
 	std::vector<int> digits; // the idea is to store digits in reverse order
 	bool negative = false;
+
+	void addAbs(const VeryLongInteger& other) {
+		std::vector<int>::iterator itThis = digits.begin();
+		std::vector<int>::const_iterator itOther = other.digits.begin();
+		int carry = 0;
+		int sum = 0;
+		std::vector<int> result(std::max(digits.size(), other.digits.size()));
+
+		while (itThis != digits.end() || itOther != other.digits.end() || carry) {
+			sum = carry;
+			if (itThis != digits.end()) sum += *itThis++;
+			if (itOther != other.digits.end()) sum += *itOther++;
+			result.push_back(sum % 10);
+			carry = sum / 10;
+		}
+
+		digits = std::move(result);
+	}
+
+	void subtractAbs(const VeryLongInteger& other) {
+		std::vector<int>::iterator itThis = digits.begin();
+		std::vector<int>::const_iterator itOther = other.digits.begin();
+		int carry = 0;
+		int sum = 0;
+		std::vector<int> result;
+
+		while (itThis != digits.end() || itOther != other.digits.end() || carry) {
+			sub = () // FIX ME
+		}
+	}
 };
 
 #endif
