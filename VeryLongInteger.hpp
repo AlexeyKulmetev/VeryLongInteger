@@ -75,12 +75,23 @@ private:
 		std::vector<int>::iterator itThis = digits.begin();
 		std::vector<int>::const_iterator itOther = other.digits.begin();
 		int carry = 0;
-		int sum = 0;
+		int sub = 0;
 		std::vector<int> result;
 
 		while (itThis != digits.end() || itOther != other.digits.end() || carry) {
-			sub = () // FIX ME
+			sub = (itThis != digits.end() ? *itThis : 0) - carry; // FIX ME
+			if (itOther != other.digits.end()) sub -= *itOther++;
+			if (sub < 0) {
+				sub += 10;
+				carry = 1;
+			}
+			else {
+				carry = 0;
+			}
+			if (itThis != digits.end()) ++itThis;
+			result.push_back(sub);
 		}
+		digits = std::move(result);
 	}
 };
 
