@@ -12,34 +12,55 @@ class VeryLongInteger {
 public:
 	VeryLongInteger() = default;
 
-	explicit VeryLongInteger(long long number) {
-		digits.reserve(static_cast<int>(log10(abs(number))) + 1); // reserve memory for number length
-		if (number < 0) negative = true;
+	explicit VeryLongInteger(const long long number) {
+		// Check if number == 0
+		if (number == 0) {
+			digits.push_back(0);
+			return;
+		}
+		// Calculate number of elements and reserve memory
+		int count = 0;
+		long long temp = number;
+		while (temp != 0) {
+			temp /= 10;
+			++count;
+		}
+		digits.reserve(static_cast<int>(count));
+
+		if (number < 0) {
+			negative = true;
+			temp = -number;
+		}
 		int digit;
-		number = std::abs(number);
-		while (number > 0) {
-			digit = number % 10;
+		while (temp > 0) {
+			digit = temp % 10;
 			digits.push_back(digit);
-			number /= 10;
+			temp /= 10;
 		}
 	}
 
-	VeryLongInteger(VeryLongInteger& other) : digits(other.digits), negative(other.negative) {}
+	VeryLongInteger(const VeryLongInteger& other) : digits(other.digits), negative(other.negative) {}
 
 	VeryLongInteger(std::string& number) {
-		digits.reserve(number.length());
-		int digit;
-		for (std::string::iterator it = number.begin(); it != number.end(); ++it) {
-			digit = *it - '0';
-			digits.push_back(digit);
+		if (!number.empty() && number[0] == '-') {
+			negative = true;
+			number.erase(number.begin());
 		}
+		digits.reserve(number.length());
+
+		for (std::string::iterator it = number.begin(); it != number.end(); ++it) {
+			if (!isdigit < *it) {
+				throw std::invalid_argument("Invalid character in number string");
+			}
+			digits.push_back(*it - '0');
+		}
+		std::reverse(digits.begin(), digits.end());
 	}
 
 	~VeryLongInteger() = default;
 
 	VeryLongInteger& operator = (const VeryLongInteger& other) {
 		if (this == &other) return *this;
-
 		digits = other.digits;
 		negative = other.negative;
 		return *this;
@@ -58,7 +79,7 @@ private:
 		std::vector<int>::const_iterator itOther = other.digits.begin();
 		int carry = 0;
 		int sum = 0;
-		std::vector<int> result(std::max(digits.size(), other.digits.size()));
+		std::vector<int> result(std::max(digits.size(), other.digits.size()) + 1);
 
 		while (itThis != digits.end() || itOther != other.digits.end() || carry) {
 			sum = carry;
@@ -76,7 +97,7 @@ private:
 		std::vector<int>::const_iterator itOther = other.digits.begin();
 		int carry = 0;
 		int sub = 0;
-		std::vector<int> result;
+		std::vector<int> result(std::max(digits.size(), other.digits.size()));
 
 		while (itThis != digits.end() || itOther != other.digits.end() || carry) {
 			sub = (itThis != digits.end() ? *itThis : 0) - carry; // FIX ME
