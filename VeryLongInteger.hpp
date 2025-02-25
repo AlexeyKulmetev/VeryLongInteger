@@ -25,7 +25,7 @@ public:
 			temp /= 10;
 			++count;
 		}
-		digits.reserve(static_cast<int>(count));
+		digits.reserve(count);
 
 		if (number < 0) {
 			negative = true;
@@ -41,7 +41,7 @@ public:
 
 	VeryLongInteger(const VeryLongInteger& other) : digits(other.digits), negative(other.negative) {}
 
-	VeryLongInteger(std::string& number) {
+	VeryLongInteger(std::string& number) { // FIX ME HANDLE THE CASE IF STRING STARTS BY ZEROS
 		if (!number.empty() && number[0] == '-') {
 			negative = true;
 			number.erase(number.begin());
@@ -67,7 +67,64 @@ public:
 	}
 
 	VeryLongInteger& operator += (const VeryLongInteger& other) {
+		// if both numbers are positive or negative
+		if (this->negative == other.negative) {
+			addAbs(other);
+		}
+		else {
+			if (absCompare(other) > 0) {
+				subtractAbs(other);
+			}
+			else {
+				VeryLongInteger temp = other;
+				temp.subtractAbs(*this);
+				this->digits = temp.digits;
+				this->negative = temp.negative; // AI advises: this->negative = !other.negative ??
+			}
+		}
+		return *this;
+	}
 
+	VeryLongInteger operator + (const VeryLongInteger& other) const {
+		VeryLongInteger sum = *this;
+		sum += other;
+		return sum;
+	}
+
+	VeryLongInteger& operator -= (const VeryLongInteger& other) {
+		if (negative) {
+			if (other.negative) {
+				addAbs(other);
+			}
+			else {
+				if (absCompare(other) > 0) {
+					subtractAbs(other);
+				}
+				else {
+					VeryLongInteger temp = other;
+					temp.subtractAbs(*this);
+					this->digits = temp.digits;
+					this->negative = temp.negative;
+				}
+			}
+		}
+		else {
+			if (!other.negative) {
+				if (absCompare(other) > 0) {
+					subtractAbs(other);
+				}
+				else {
+					VeryLongInteger temp = other;
+					temp.subtractAbs(*this);
+					this->digits = temp.digits;
+					this->negative = true;
+				}
+			}
+			else {
+				absCompare(other);
+			}
+		}
+		return *this;
 	}
 
 private:
@@ -100,7 +157,7 @@ private:
 		std::vector<int> result(std::max(digits.size(), other.digits.size()));
 
 		while (itThis != digits.end() || itOther != other.digits.end() || carry) {
-			sub = (itThis != digits.end() ? *itThis : 0) - carry; // FIX ME
+			sub = (itThis != digits.end() ? *itThis : 0) - carry; // FIX ME DELETE LEEDING ZEROES
 			if (itOther != other.digits.end()) sub -= *itOther++;
 			if (sub < 0) {
 				sub += 10;
@@ -113,6 +170,18 @@ private:
 			result.push_back(sub);
 		}
 		digits = std::move(result);
+	}
+
+	int absCompare(const VeryLongInteger& other) const {
+		if (digits.size() != other.digits.size()) {
+			return digits.size() < other.digits.size() ? -1 : 1;
+		}
+		for (size_t i = 0; i < digits.size(); ++i) {
+			if (digits[i] != other.digits[i]) {
+				return digits[i] < other.digits[i] ? -1 : 1;
+			}
+		}
+		return 0;
 	}
 };
 
