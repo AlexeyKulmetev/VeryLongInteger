@@ -41,10 +41,16 @@ public:
 
 	VeryLongInteger(const VeryLongInteger& other) : digits(other.digits), negative(other.negative) {}
 
-	VeryLongInteger(std::string& number) { // FIX ME HANDLE THE CASE IF STRING STARTS BY ZEROS
-		if (!number.empty() && number[0] == '-') {
+	VeryLongInteger(const std::string& str) { // FIX ME HANDLE THE CASE IF STRING STARTS BY ZEROS
+		if (str.empty() || (str.size() == 1 && !isdigit(str[0]))) { // handle empty string and one nonint symbol
+			digits.push_back(0);
+			return;
+		}
+		// Implement the concept to not copy argument and process string
+		std::string::const_iterator it; 
+		if (number[0] == '-') {
 			negative = true;
-			number.erase(number.begin());
+			it = number.begin() + 1; // to exclude first char //number.erase(number.begin());
 		}
 		digits.reserve(number.length());
 
