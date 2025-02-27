@@ -42,20 +42,20 @@ public:
 	VeryLongInteger(const VeryLongInteger& other) : digits(other.digits), negative(other.negative) {}
 
 	VeryLongInteger(const std::string& str) { // FIX ME HANDLE THE CASE IF STRING STARTS BY ZEROS
+		// FIX ME perhaps create copy of str and modified it is the best practice ??
 		if (str.empty() || (str.size() == 1 && !isdigit(str[0]))) { // handle empty string and one nonint symbol
 			digits.push_back(0);
 			return;
 		}
 		// Implement the concept to not copy argument and process string
-		std::string::const_iterator it; 
-		if (number[0] == '-') {
+		std::string::const_iterator it = str.begin(); 
+		if (str[0] == '-' && str.size() > 1) {
 			negative = true;
-			it = number.begin() + 1; // to exclude first char //number.erase(number.begin());
+			++it; // to exclude first char instead of number.erase(number.begin());
 		}
-		digits.reserve(number.length());
-
-		for (std::string::iterator it = number.begin(); it != number.end(); ++it) {
-			if (!isdigit < *it) {
+		digits.reserve(str.length());
+		for (; it != str.end(); ++it) {
+			if (!isdigit(*it)) {
 				throw std::invalid_argument("Invalid character in number string");
 			}
 			digits.push_back(*it - '0');
