@@ -159,10 +159,60 @@ public:
 		return *this;
 	}
 
-	VeryLongInteger operator * (const VeryLongInteger& other) {
+	VeryLongInteger operator * (const VeryLongInteger& other) const {
 		VeryLongInteger prod = *this;
 		prod *= other;
 		return prod;
+	}
+
+	VeryLongInteger& operator /= (const VeryLongInteger& other) {
+		// checking division by zero
+		if (other.digits.size() == 1 && other.digits[0] == 0) {
+			throw std::invalid_argument("Division by zero");
+		}
+		// define sign of result
+		bool resultNegative = (negative != other.negative);
+		// work with absolute values
+		negative = false;
+		VeryLongInteger divisor = other;
+		divisor.negative = false;
+		// initialization of result and current remainder of division
+		VeryLongInteger quotient;  // result
+		VeryLongInteger remainder; // current remainder
+		
+		// division
+		for (int i = digits.size() - 1; i >= 0; --i) {
+			// add next digit of devident to remainder
+			remainder.digits.insert(remainder.digits.begin(), digits[i]);
+			// delete leading zeroes
+			while (remainder.digits.size() > 1 && remainder.digits.back() == 0) {
+				remainder.digits.pop_back();
+			}
+			// define how many times the divisor fits into the remainder
+			int count = 0;
+			while (remainder >= divisor) {
+				remainder -= divisor; // subtract the divisor from the remainder
+				++count;
+			}
+			// add count to quotien
+			quotient.digits.insert(quotient.digits.begin(), count);
+		}
+		// delete leading zeroes
+		while (quotient.digits.size() > 0 && quotient.digits.back() == 0) {
+			quotient.digits.pop_back();
+		}
+		digits = quotient.digits;
+		negative = resultNegative;
+	}
+
+	VeryLongInteger operator / (const VeryLongInteger& other) const {
+		VeryLongInteger quotient = *this;
+		quotient /= other;
+		return quotient;
+	}
+
+	bool operator >= (const VeryLongInteger& other) {
+		return absCompare(other) >= 0;
 	}
 
 	friend std::ostream& operator << (std::ostream& out, const VeryLongInteger& num);
@@ -230,7 +280,7 @@ private:
 		if (digits.size() != other.digits.size()) {
 			return digits.size() - other.digits.size(); // returns different between sizes
 		}
-		for (size_t i = 0; i < digits.size(); ++i) {
+		for (int i = digits.size() - 1; i >= 0; --i) {
 			if (digits[i] != other.digits[i]) {
 				return digits[i] - other.digits[i];
 			}
