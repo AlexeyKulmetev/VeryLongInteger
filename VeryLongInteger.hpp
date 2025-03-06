@@ -150,9 +150,11 @@ public:
 			}
 		}
 		// delete leading zeros
-		while (result.size() > 1 && result.back() == 0) {
-			result.pop_back();
-		}
+		//while (result.size() > 1 && result.back() == 0) {
+		//	result.pop_back();
+		//}
+		removeLeadingZeroes(result);
+
 		if (result.empty()) result.push_back(0);
 		digits = std::move(result);
 		negative = (negative != other.negative);
@@ -185,9 +187,10 @@ public:
 			// add next digit of devident to remainder
 			remainder.digits.insert(remainder.digits.begin(), digits[i]);
 			// delete leading zeroes
-			while (remainder.digits.size() > 1 && remainder.digits.back() == 0) {
-				remainder.digits.pop_back();
-			}
+			//while (remainder.digits.size() > 1 && remainder.digits.back() == 0) {
+			//	remainder.digits.pop_back();
+			//}
+			removeLeadingZeroes(remainder.digits);
 			// define how many times the divisor fits into the remainder
 			int count = 0;
 			while (remainder >= divisor) {
@@ -198,9 +201,11 @@ public:
 			quotient.digits.insert(quotient.digits.begin(), count);
 		}
 		// delete leading zeroes
-		while (quotient.digits.size() > 0 && quotient.digits.back() == 0) {
-			quotient.digits.pop_back();
-		}
+		//while (quotient.digits.size() > 0 && quotient.digits.back() == 0) {
+		//	quotient.digits.pop_back();
+		//}
+		removeLeadingZeroes(quotient.digits);
+
 		digits = quotient.digits;
 		negative = resultNegative;
 	}
@@ -211,8 +216,52 @@ public:
 		return quotient;
 	}
 
-	bool operator >= (const VeryLongInteger& other) {
+	VeryLongInteger operator % (const VeryLongInteger& other) const {
+		// check division by zero
+		if (other.digits.size() == 1 && other.digits[0] == 0) {
+			throw std::invalid_argument("Division by zero");
+		}
+		// calculate the integer quotient
+		VeryLongInteger quotient = *this / other;
+
+		// calculate the remainder of division
+		VeryLongInteger remainder = *this - other * quotient;
+
+		// handle the negative remainder
+		if (remainder.negative) {
+			remainder += other.abs();
+		}
+		return remainder;
+	}
+
+	bool operator < (const VeryLongInteger& other) const {
+		return absCompare(other) < 0;
+	}
+
+	bool operator > (const VeryLongInteger& other) const {
+		return absCompare(other) > 0;
+	}
+
+	bool operator <= (const VeryLongInteger& other) const {
+		return absCompare(other) <= 0;
+	}
+
+	bool operator >= (const VeryLongInteger& other) const {
 		return absCompare(other) >= 0;
+	}
+
+	bool operator == (const VeryLongInteger& other) const {
+		return absCompare(other) == 0;
+	}
+
+	bool operator != (const VeryLongInteger& other) const {
+		return absCompare(other) != 0;
+	}
+
+	VeryLongInteger abs() const {
+		VeryLongInteger resultAbs = *this;
+		resultAbs.negative = false;
+		return resultAbs;
 	}
 
 	friend std::ostream& operator << (std::ostream& out, const VeryLongInteger& num);
@@ -238,9 +287,12 @@ private:
 			result.push_back(sum % 10);
 			carry = sum / 10;
 		}
-		while (result.size() > 1 && result.back() == 0) {
-			result.pop_back();
-		}
+		// delete leading zeroes
+		//while (result.size() > 1 && result.back() == 0) {
+		//	result.pop_back();
+		//}
+		removeLeadingZeroes(result);
+
 		if (result.empty()) result.push_back(0);
 		digits = std::move(result);
 	}
@@ -269,16 +321,19 @@ private:
 			result.push_back(sub);
 		}
 		// Delete leading zeroes :
-		while (result.size() > 1 && result.back() == 0) {
-			result.pop_back();
-		}
+		//while (result.size() > 1 && result.back() == 0) {
+		//	result.pop_back();
+		//}
+		removeLeadingZeroes(result);
+
 		if (result.empty()) result.push_back(0);
 		digits = std::move(result);
 	}
 
+	// return > 0 if digits larger than other.digits, < 0 if smaller and return 0 if they equal
 	int absCompare(const VeryLongInteger& other) const {
 		if (digits.size() != other.digits.size()) {
-			return digits.size() - other.digits.size(); // returns different between sizes
+			return digits.size() - other.digits.size(); // return different between sizes
 		}
 		for (int i = digits.size() - 1; i >= 0; --i) {
 			if (digits[i] != other.digits[i]) {
@@ -287,7 +342,14 @@ private:
 		}
 		return 0;
 	}
+
+	void removeLeadingZeroes(std::vector<int>& vec) {
+		while (vec.size() > 1 && vec.back() == 0) {
+			vec.pop_back();
+		}
+	}
 };
+
 
 std::ostream& operator << (std::ostream& out, const VeryLongInteger& num) {
 	if (num.negative) {
