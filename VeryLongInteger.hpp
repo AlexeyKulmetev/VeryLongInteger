@@ -258,6 +258,41 @@ public:
 		return absCompare(other) != 0;
 	}
 
+	VeryLongInteger operator ^ (const VeryLongInteger& exponent) const {
+		// handle negative exponent
+		if (exponent.negative) {
+			throw std::invalid_argument("Negative exponents are not supported");
+		}
+		// handle zero exponent
+		if (exponent.digits.size() == 1 && exponent.digits[0] == 0) {
+			return VeryLongInteger(1);
+		}
+		// handle exponent == 1
+		if (exponent.digits.size() == 1 && exponent.digits[0] == 1) {
+			return *this;
+		}
+
+		VeryLongInteger result(1);
+		VeryLongInteger base = *this;
+		VeryLongInteger exp = exponent;
+
+		// fast exponentiation algorithm
+		// FIX ME
+		// it may be necessary to implement functionality for working with integers
+		// to avoid redundant conversions from integer to VeryLongInteger
+		while (exp > VeryLongInteger(0)) {
+			// if exponent is odd, multiply result by base
+			if (exp.digits[0] % 2 == 1) { // enough to check the least signigicant digit
+				result *= base;
+			}
+			// divide exponent on 2
+			exp /= VeryLongInteger(2);
+			// square the base
+			base *= base;
+		}
+		return result;
+	}
+
 	VeryLongInteger abs() const {
 		VeryLongInteger resultAbs = *this;
 		resultAbs.negative = false;
